@@ -11,12 +11,12 @@ public class TeamsConfigurationRequestFactory {
     public static ConfigurationRequest createTeamsMessageOutputConfigurationRequest() {
         final ConfigurationRequest configurationRequest = new ConfigurationRequest();
         configurationRequest.addField(new TextField(
-                TeamsConfiguration.CK_COLOR, "Custom Message & Additional Info Color", "#FF0000",
+                TeamsConfiguration.CK_COLOR, "Custom Message & Additional Info Color", "FF0000",
                 "Color to use for Teams custom message and additional information attachments",
                 ConfigurationField.Optional.NOT_OPTIONAL)
         );
         configurationRequest.addField(new TextField(
-                TeamsConfiguration.CK_TEXT, "text",
+                TeamsConfiguration.CK_FACTS, "Facts",
                 "##########\n" +
                         "Date: ${check_result.triggeredAt}\n" +
                         "Stream ID: ${stream.id}\n" +
@@ -46,7 +46,7 @@ public class TeamsConfigurationRequestFactory {
         );
 
         configurationRequest.addField(new TextField(
-                TeamsConfiguration.CK_SUMMARY, "Summary", "New Alert",
+                TeamsConfiguration.CK_SUMMARY, "Summary", "Graylog Alert",
                 "Summary of Post",
                 ConfigurationField.Optional.NOT_OPTIONAL)
         );
@@ -74,20 +74,20 @@ public class TeamsConfigurationRequestFactory {
         final ConfigurationRequest configurationRequest = new ConfigurationRequest();
 
         configurationRequest.addField(new TextField(
-                TeamsConfiguration.CK_COLOR, "Custom Message & Additional Info Color", "#FF0000",
+                TeamsConfiguration.CK_COLOR, "Custom Color", "#FF0000",
                 "Color to use for Teams custom message and additional information attachments",
                 ConfigurationField.Optional.NOT_OPTIONAL)
         );
         configurationRequest.addField(new TextField(
-                TeamsConfiguration.CK_TEXT, "text",
-                "##########\n" +
+                TeamsConfiguration.CK_FACTS, "facts",
+                        "##########\n" +
                         "Date: ${check_result.triggeredAt}\n" +
                         "Stream ID: ${stream.id}\n" +
                         "Stream title: ${stream.title}\n" +
                         "Stream description: ${stream.description}\n" +
                         "${if stream_url}Stream URL: ${stream_url}${end}\n" +
                         "##########\n",
-                "Custom message to be appended below the alert title. " +
+                        "Custom message to be appended below the alert title. " +
                         "The following properties are available for template building: " +
                         "\"stream\", " +
                         "\"message\", " +
@@ -113,7 +113,7 @@ public class TeamsConfigurationRequestFactory {
         );
 
         configurationRequest.addField(new TextField(
-                TeamsConfiguration.CK_SUMMARY, "Summary", "New Alert", "",
+                TeamsConfiguration.CK_SUMMARY, "Summary", "GraylogAlert", "",
                 ConfigurationField.Optional.NOT_OPTIONAL)
         );
 

@@ -20,36 +20,37 @@ public class TeamsMessage {
     private final String context;
     private final String type;
     private final String themeColor;
-    private final String text;
     private final List<AttachmentField> detailFields;
     private String customMessage;
-    private final String summary;
     private final String title;
+    private final String summary;
+    private final ArrayList sections;
     public TeamsMessage(
             String themeColor,
-            String context,
             String type,
-            String text,
+            String context,
+            String title,
             String summary,
-            String title
+            ArrayList sections
     ) {
         this.themeColor = themeColor;
-        this.context = context;
         this.type = type;
-        this.text = text; 
+        this.context = context;
+        this.title = title;
+        this.summary = summary;
+        this.sections = sections; 
         this.detailFields = Lists.newArrayList();
         this.customMessage = null;
-        this.summary = summary;
-        this.title = title;
     }
 
     public String getJsonString() {
         final Map<String, Object> params = new HashMap<String, Object>() {{
-            put("text", text);
-            put("context", context);
-            put("type", type);
-            put("summary", summary);
+            put("@context", context);
+            put("@type", type);
+            put("themeColor", themeColor);
             put("title", title);
+            put("summary", summary);
+            put("sections", sections);
         }};
 
         final List<Attachment> attachments = new ArrayList<>();
@@ -90,10 +91,6 @@ public class TeamsMessage {
         this.detailFields.add(attachmentField);
     }
 
-    public void setCustomMessage(String customMessage) {
-        this.customMessage = customMessage;
-    }
-
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Attachment {
@@ -122,15 +119,15 @@ public class TeamsMessage {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class AttachmentField {
         @JsonProperty
-        public String ttitle;
+        public String title;
         @JsonProperty
         public String value;
         @JsonProperty("short")
         public boolean isShort;
 
         @JsonCreator
-        public AttachmentField(String ttitle, String value, boolean isShort) {
-            this.ttitle = ttitle;
+        public AttachmentField(String title, String value, boolean isShort) {
+            this.title = title;
             this.value = value;
             this.isShort = isShort;
         }

@@ -19,8 +19,8 @@ public class TeamsMessageOutputTest {
             .put("@type", "MessageCard")
             .put("themeColor", "FF0000")
             .put("webhook_url", "https://outlook.office.com/webhook/9d969916-dd73-4b6b-a188-7154538d97c8@37f288ac-734b-4265-9187-18425e5894af/IncomingWebhook/202bd16d5b1f4cdc87cad933be3ae64e/00797f40-2bd0-4fca-959a-16170431aaef")
-            .put("summary", "Test Alert")
             .put("title", "Graylog")
+            .put("summary","GraylogAlert")
             .build();
 
     @Test
@@ -28,7 +28,7 @@ public class TeamsMessageOutputTest {
         TeamsMessageOutput output = new TeamsMessageOutput(null, new Configuration(VALID_CONFIG_SOURCE), Engine.createDefaultEngine());
 
         final Map<String, Object> attributes = output.getConfiguration();
-        assertThat(attributes.keySet(), hasItems("@context", "@type", "themeColor","summary","title","webhook_url"));
+        assertThat(attributes.keySet(), hasItems("@context", "@type", "themeColor","title", "summary","webhook_url"));
     }
 
      @Test

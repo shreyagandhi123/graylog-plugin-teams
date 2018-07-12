@@ -9,6 +9,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ArrayList;
 
 public class TeamsPluginBase {
 
@@ -73,14 +77,14 @@ public class TeamsPluginBase {
         return baseUrl + "streams/" + stream.getId() + "/messages?q=%2A&rangetype=relative&relative=3600";
     }
 
-    protected static TeamsMessage createTeamsMessage(Configuration configuration, String message) {
-        String color = configuration.getString(TeamsConfiguration.CK_COLOR);
+    protected static TeamsMessage createTeamsMessage(Configuration configuration, ArrayList sections) {
+        String themeColor = configuration.getString(TeamsConfiguration.CK_COLOR);
         String type = configuration.getString(TeamsConfiguration.CK_TYPE);
         String context = configuration.getString(TeamsConfiguration.CK_CONTEXT);
-        String summary = configuration.getString(TeamsConfiguration.CK_SUMMARY);
         String title = configuration.getString(TeamsConfiguration.CK_TITLE);
+        String summary = configuration.getString(TeamsConfiguration.CK_SUMMARY);
 
-        return new TeamsMessage(color, context,type, summary,title, message);
+        return new TeamsMessage(themeColor, context, type, title, summary, sections);
     }
 
     protected String buildMessageLink(String baseUrl, String index, String id) {

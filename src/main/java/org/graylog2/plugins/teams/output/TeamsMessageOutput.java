@@ -4,6 +4,7 @@ import com.floreysoft.jmte.Engine;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -22,6 +23,7 @@ import org.joda.time.format.DateTimeFormat;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -72,15 +74,36 @@ public class TeamsMessageOutput extends TeamsPluginBase implements MessageOutput
     public void write(Message msg) throws RuntimeException {
         boolean shortMode = configuration.getBoolean(TeamsConfiguration.CK_SHORT_MODE);
         String message = shortMode ? buildShortMessageBody(msg) : buildFullMessageBody(stream, msg);
-        TeamsMessage teamsMessage = createTeamsMessage(configuration, message);
 
-        // Add custom message
-        String template = configuration.getString(TeamsConfiguration.CK_TEXT);
-        Boolean hasTemplate = !isNullOrEmpty(template);
-        if (!shortMode && hasTemplate) {
-            String customMessage = buildCustomMessage(stream, msg, template);
-            teamsMessage.setCustomMessage(customMessage);
-        }
+        String ttext = message;
+
+        ArrayList section = new ArrayList();
+        Map<String, Object> section1 = new HashMap<String, Object>();
+        ArrayList facts = new ArrayList();
+        Map<String, Object> mMap = new HashMap<String, Object>();
+
+        //mMap.put("name", "Date: ");
+        //mMap.put("value", result.getTriggeredAt().toString());
+        //facts.add(mMap);
+        mMap = new HashMap<String, Object>();
+        mMap.put("name", "Stream Title: ");
+        mMap.put("value", stream.getTitle());
+        facts.add(mMap);
+        mMap = new HashMap<String, Object>();
+        mMap.put("name", "Stream Description: ");
+        mMap.put("value", stream.getDescription());
+        facts.add(mMap);
+        //mMap = new HashMap<String, Object>();
+        //mMap.put("name", "Trigred Condition: ");
+        //mMap.put("value", result.getTriggeredCondition().toString());
+        //facts.add(mMap);
+
+        section1.put("facts", facts);
+        section1.put("text", ttext);
+
+        section.add(section1);
+
+        TeamsMessage teamsMessage = createTeamsMessage(configuration, section);
 
         try {
             client.send(teamsMessage);
@@ -103,15 +126,15 @@ public class TeamsMessageOutput extends TeamsPluginBase implements MessageOutput
         String graylogUri = "";
         String titleLink;
         if (!isNullOrEmpty(graylogUri)) {
-            titleLink = "<" + buildStreamLink(graylogUri, stream) + "|" + stream.getTitle() + ">";
+            titleLink = "**" + buildStreamLink(graylogUri, stream) + "|" + stream.getTitle() + "**";
         } else {
-            titleLink = "_" + stream.getTitle() + "_";
+            titleLink = "*" + stream.getTitle() + "*";
         }
 
         String messageLink;
         if (!isNullOrEmpty(graylogUri)) {
             String index = "graylog_deflector"; // would use msg.getFieldAs(String.class, "_index"), but it returns null
-            messageLink = "<" + buildMessageLink(graylogUri, index, msg.getId()) + "|New message>";
+            messageLink = "**" + buildMessageLink(graylogUri, index, msg.getId()) + "|New message**";
         } else {
             messageLink = "New message";
         }

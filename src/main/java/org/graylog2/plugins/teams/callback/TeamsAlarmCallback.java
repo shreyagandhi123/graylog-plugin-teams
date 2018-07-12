@@ -20,6 +20,7 @@ import org.graylog2.plugins.teams.configuration.TeamsConfigurationRequestFactory
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -46,16 +47,44 @@ public class TeamsAlarmCallback extends TeamsPluginBase implements AlarmCallback
     @Override
     public void call(Stream stream, AlertCondition.CheckResult result) {
         final TeamsClient client = new TeamsClient(configuration);
-        String text = buildFullMessageBody(stream, result);
-        TeamsMessage teamsMessage = createTeamsMessage(configuration, text);
+        String ttext = buildFullMessageBody(stream, result);
 
-        // Add custom message
-        String template = configuration.getString(TeamsConfiguration.CK_TEXT);
-        boolean hasTemplate = !isNullOrEmpty(template);
-        if (hasTemplate) {
-            String customMessage = buildCustomMessage(stream, result, template);
-            teamsMessage.setCustomMessage(customMessage);
-        }
+        ArrayList section = new ArrayList();
+        Map<String, Object> section1 = new HashMap<String, Object>();
+        ArrayList facts = new ArrayList();
+        Map<String, Object> mMap = new HashMap<String, Object>();
+
+        String temp = result.getTriggeredAt().toString();
+        mMap.put("name", "Date: ");
+        mMap.put("value",temp);
+        facts.add(mMap);
+        temp = stream.getTitle();
+        mMap = new HashMap<String, Object>();
+        mMap.put("name", "Stream Title: ");
+        mMap.put("value",temp);
+        facts.add(mMap);
+        temp = stream.getDescription();
+        mMap = new HashMap<String, Object>();
+        mMap.put("name", "Stream Description: ");
+        mMap.put("value",temp);
+        facts.add(mMap);
+        temp = result.getResultDescription();
+        mMap = new HashMap<String, Object>();
+        mMap.put("name", "Result Description: ");
+        mMap.put("value",temp);
+        facts.add(mMap);
+        temp = result.getTriggeredCondition().toString();
+        mMap = new HashMap<String, Object>();
+        mMap.put("name", "Triggered Condition: ");
+        mMap.put("value",temp);
+        facts.add(mMap);
+
+        section1.put("facts", facts);
+        section1.put("text", ttext);
+
+        section.add(section1);
+
+        TeamsMessage teamsMessage = createTeamsMessage(configuration, section);
 
         try {
             client.send(teamsMessage);
@@ -70,12 +99,12 @@ public class TeamsAlarmCallback extends TeamsPluginBase implements AlarmCallback
         if (!isNullOrEmpty(graylogUri)) {
             titleLink = "<" + buildStreamLink(graylogUri, stream) + "|" + stream.getTitle() + ">";
         } else {
-            titleLink = "_" + stream.getTitle() + "_";
+            titleLink = "*" + stream.getTitle() + "*";
         }
 
         // Build custom message
         String description = result.getResultDescription();
-        return String.format("*Alert for Graylog stream %s*:\n> %s \n", titleLink, description);
+        return String.format("**Alert for Graylog stream %s**:\n> %s \n", titleLink, description);
     }
 
     private String buildCustomMessage(Stream stream, AlertCondition.CheckResult result, String template) {
